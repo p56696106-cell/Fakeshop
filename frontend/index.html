@@ -7,9 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        /* ============================================================
-           ВСЕ СТИЛИ — ТУТ
-           ============================================================ */
+        /* ===== БАЗА ===== */
         * {
             margin: 0;
             padding: 0;
@@ -24,8 +22,7 @@
             min-height: 100dvh;
             overflow-x: hidden;
         }
-
-        /* --- ПЛАВАЮЩИЕ ЭМОДЗИ --- */
+        /* ===== ПЛАВАЮЩИЕ ЭМОДЗИ ===== */
         .floating-emojis {
             position: fixed;
             top: 0;
@@ -39,7 +36,7 @@
         .floating-emojis span {
             position: absolute;
             font-size: 28px;
-            opacity: 0.07;
+            opacity: 0.06;
             animation: floatEmoji 22s linear infinite;
         }
         @keyframes floatEmoji {
@@ -48,22 +45,100 @@
                 opacity: 0;
             }
             10% {
-                opacity: 0.07;
+                opacity: 0.06;
             }
             90% {
-                opacity: 0.07;
+                opacity: 0.06;
             }
             100% {
                 transform: translateY(-10vh) rotate(720deg);
                 opacity: 0;
             }
         }
-
-        /* --- ШАПКА --- */
+        /* ===== ВСПЛЫВАЮЩЕЕ ОКНО С ЦИТАТОЙ ===== */
+        .quote-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            animation: fadeInQuote 0.5s ease;
+        }
+        .quote-overlay.show {
+            display: flex;
+        }
+        .quote-box {
+            background: rgba(20, 20, 40, 0.92);
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px 28px;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(0, 180, 255, 0.05);
+            animation: bounceQuote 0.6s ease;
+        }
+        .quote-box .quote-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            opacity: 0.4;
+        }
+        .quote-box .quote-text {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #f0f4ff;
+        }
+        .quote-box .quote-author {
+            margin-top: 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.25);
+        }
+        .quote-box .quote-close {
+            margin-top: 16px;
+            padding: 6px 24px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(0, 180, 255, 0.08);
+            color: #00d4ff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .quote-box .quote-close:hover {
+            background: rgba(0, 180, 255, 0.15);
+        }
+        @keyframes fadeInQuote {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        @keyframes bounceQuote {
+            0% {
+                transform: scale(0.8) translateY(20px);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.02) translateY(-4px);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) translateY(0);
+            }
+        }
+        /* ===== ШАПКА ===== */
         .header {
             background: rgba(10, 10, 15, 0.75);
             backdrop-filter: blur(24px) saturate(1.4);
-            -webkit-backdrop-filter: blur(24px) saturate(1.4);
             border-bottom: 1px solid rgba(0, 180, 255, 0.06);
             padding: 12px 16px;
             position: sticky;
@@ -76,25 +151,56 @@
             align-items: center;
         }
         .logo {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 900;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            display: inline-block;
+            padding: 4px 12px 4px 8px;
             background: linear-gradient(135deg, #00d4ff 0%, #0066ff 50%, #00ccff 100%);
-            background-size: 200% 200%;
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: shimmerLogo 4s ease-in-out infinite;
-            cursor: pointer;
-            user-select: none;
+            animation: logoGlow 3s ease-in-out infinite;
+            letter-spacing: -0.5px;
+            transition: transform 0.2s;
         }
-        @keyframes shimmerLogo {
-            0%,
-            100% {
+        .logo::after {
+            content: '⚡';
+            position: absolute;
+            right: -24px;
+            top: -4px;
+            font-size: 16px;
+            -webkit-text-fill-color: initial;
+            color: #ffd700;
+            animation: sparkle 1.8s ease-in-out infinite;
+        }
+        @keyframes logoGlow {
+            0% {
                 background-position: 0% 50%;
             }
             50% {
                 background-position: 100% 50%;
             }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        @keyframes sparkle {
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(0.8) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.2) rotate(15deg);
+            }
+        }
+        .logo:active {
+            transform: scale(0.92);
         }
         .header-right {
             display: flex;
@@ -103,7 +209,6 @@
         .header-btn {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: rgba(255, 255, 255, 0.6);
             width: 40px;
@@ -140,8 +245,7 @@
             border: 2px solid #0a0a0f;
             box-shadow: 0 0 20px rgba(255, 0, 100, 0.3);
         }
-
-        /* --- ПОИСК --- */
+        /* ===== ПОИСК ===== */
         .search-container {
             max-height: 0;
             overflow: hidden;
@@ -158,7 +262,6 @@
             border-radius: 14px;
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             color: #f0f4ff;
             font-size: 15px;
             outline: none;
@@ -186,8 +289,7 @@
             font-size: 16px;
             cursor: pointer;
         }
-
-        /* --- КАТЕГОРИИ --- */
+        /* ===== КАТЕГОРИИ ===== */
         .categories-scroll {
             display: flex;
             gap: 8px;
@@ -220,20 +322,16 @@
             border-color: rgba(0, 180, 255, 0.2);
             box-shadow: 0 0 30px rgba(0, 180, 255, 0.06);
         }
-
-        /* --- СЕТКА --- */
+        /* ===== СЕТКА РАНДОМНАЯ ===== */
         .products-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 14px;
             padding: 14px 12px;
         }
-
-        /* --- КАРТОЧКИ С РАНДОМНЫМИ СКРУГЛЕНИЯМИ --- */
         .product-card {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.04);
             overflow: hidden;
             cursor: pointer;
@@ -269,7 +367,17 @@
                 filter: blur(0);
             }
         }
-
+        /* рандомные размеры карточек */
+        .product-card.wide {
+            grid-column: span 2;
+        }
+        .product-card.tall {
+            grid-row: span 2;
+        }
+        .product-card.small {
+            grid-column: span 1;
+            grid-row: span 1;
+        }
         .product-image {
             width: 100%;
             aspect-ratio: 1/1;
@@ -292,7 +400,6 @@
             left: 10px;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             padding: 2px 12px;
             border-radius: 100px;
             font-size: 9px;
@@ -311,7 +418,6 @@
             border-radius: 50%;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: rgba(255, 255, 255, 0.5);
             font-size: 13px;
@@ -351,8 +457,6 @@
         .product-status.out-of-stock {
             color: #ff4466;
         }
-
-        /* --- КНОПКИ --- */
         .product-actions {
             display: flex;
             gap: 8px;
@@ -384,8 +488,6 @@
             background: rgba(255, 255, 255, 0.06);
             color: rgba(255, 255, 255, 0.8);
         }
-
-        /* --- ЗАГРУЗКА --- */
         .load-more-container {
             text-align: center;
             padding: 16px 0;
@@ -393,7 +495,6 @@
         .load-more-btn {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.04);
             color: rgba(255, 255, 255, 0.4);
             padding: 10px 32px;
@@ -417,14 +518,12 @@
             margin-bottom: 12px;
             opacity: 0.3;
         }
-
-        /* --- КОРЗИНА --- */
+        /* ===== КОРЗИНА ===== */
         .cart-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             z-index: 200;
             display: none;
         }
@@ -438,7 +537,6 @@
             right: 0;
             background: rgba(16, 16, 28, 0.92);
             backdrop-filter: blur(32px) saturate(1.4);
-            -webkit-backdrop-filter: blur(32px) saturate(1.4);
             border-radius: 24px 24px 0 0;
             border-top: 1px solid rgba(0, 180, 255, 0.04);
             padding: 16px 16px 30px;
@@ -576,14 +674,12 @@
         .checkout-btn:active {
             transform: scale(0.97);
         }
-
-        /* --- МОДАЛКИ --- */
+        /* ===== МОДАЛКИ ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(20px) saturate(1.2);
-            -webkit-backdrop-filter: blur(20px) saturate(1.2);
             z-index: 300;
             display: none;
             align-items: center;
@@ -596,7 +692,6 @@
         .modal-container {
             background: rgba(16, 16, 28, 0.92);
             backdrop-filter: blur(32px) saturate(1.4);
-            -webkit-backdrop-filter: blur(32px) saturate(1.4);
             border-radius: 20px;
             border: 1px solid rgba(0, 180, 255, 0.04);
             max-width: 440px;
@@ -613,7 +708,6 @@
             right: 12px;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             border: none;
             color: rgba(255, 255, 255, 0.4);
             width: 36px;
@@ -674,8 +768,7 @@
             padding: 14px 0;
             font-size: 15px;
         }
-
-        /* --- ФОРМЫ --- */
+        /* ===== ФОРМЫ ===== */
         .order-form h2 {
             font-size: 20px;
             margin-bottom: 16px;
@@ -702,7 +795,6 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             color: #fff;
             font-size: 15px;
             outline: none;
@@ -721,7 +813,6 @@
         .order-summary {
             background: rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             border-radius: 12px;
             padding: 12px 14px;
             margin: 12px 0 16px;
@@ -786,8 +877,7 @@
             font-size: 15px;
             cursor: pointer;
         }
-
-        /* --- TOAST --- */
+        /* ===== TOAST ===== */
         .toast {
             position: fixed;
             bottom: 100px;
@@ -795,7 +885,6 @@
             transform: translateX(-50%);
             background: rgba(16, 16, 28, 0.92);
             backdrop-filter: blur(24px) saturate(1.4);
-            -webkit-backdrop-filter: blur(24px) saturate(1.4);
             border: 1px solid rgba(255, 255, 255, 0.04);
             padding: 12px 24px;
             border-radius: 14px;
@@ -807,8 +896,7 @@
         .toast.show {
             display: block;
         }
-
-        /* --- АДМИНКА --- */
+        /* ===== АДМИНКА ===== */
         .admin-nav {
             display: flex;
             gap: 6px;
@@ -1101,6 +1189,16 @@
     <!-- ===== ПЛАВАЮЩИЕ ЭМОДЗИ ===== -->
     <div class="floating-emojis" id="floatingEmojis"></div>
 
+    <!-- ===== ВСПЛЫВАЮЩЕЕ ОКНО С ЦИТАТОЙ ===== -->
+    <div class="quote-overlay" id="quoteOverlay">
+        <div class="quote-box">
+            <div class="quote-icon">💬</div>
+            <div class="quote-text" id="quoteText">—</div>
+            <div class="quote-author" id="quoteAuthor">—</div>
+            <button class="quote-close" id="quoteCloseBtn">✕</button>
+        </div>
+    </div>
+
     <!-- ===== ШАПКА ===== -->
     <header class="header">
         <div class="header-top">
@@ -1182,7 +1280,9 @@
                     <div class="form-group"><label>Название *</label><input type="text" id="productName" placeholder="Название"></div>
                     <div class="form-row"><div class="form-group"><label>Цена (BYN) *</label><input type="number" id="productPrice" placeholder="0" step="0.01"></div><div class="form-group"><label>Количество *</label><input type="number" id="productQuantity" placeholder="0"></div></div>
                     <div class="form-group"><label>Категория</label><select id="productCategory"><option value="Все">Все</option></select></div>
-                    <div class="form-group"><label>Фото</label><input type="text" id="productPhoto" placeholder="https://..."></div>
+                    <div class="form-group"><label>Фото (ссылка 1) *</label><input type="text" id="productPhoto1" placeholder="https://..."></div>
+                    <div class="form-group"><label>Фото (ссылка 2) (опционально)</label><input type="text" id="productPhoto2" placeholder="https://..."></div>
+                    <div class="form-group"><label>Фото (ссылка 3) (опционально)</label><input type="text" id="productPhoto3" placeholder="https://..."></div>
                     <div class="form-group"><label>Примечание</label><textarea id="productNote" placeholder="Дополнительно"></textarea></div>
                     <div class="form-checkbox"><input type="checkbox" id="productFromChina"><label for="productFromChina">Из Китая</label></div>
                     <div class="form-actions"><button class="cancel-btn" id="productFormCancel">Отмена</button><button class="submit-btn" id="productFormSubmit">Сохранить</button></div>
@@ -1327,7 +1427,7 @@
 
     <script>
         // ============================================================
-        // ВЕСЬ JS — ТУТ
+        // ВЕСЬ JS
         // ============================================================
 
         // --- ПЛАВАЮЩИЕ ЭМОДЗИ ---
@@ -1346,18 +1446,77 @@
             }
         })();
 
-        // --- РАНДОМНЫЕ СКРУГЛЕНИЯ ДЛЯ КАРТОЧЕК ---
+        // --- ЦИТАТЫ ---
+        const quotes = [
+            { text: 'Если перед тобой закрылась одна дверь, просто открой её — ведь так работают двери.', author: 'Джейсон Стетхем' },
+            { text: 'В жизни всегда есть две дороги. Одна — первая, вторая — вторая.', author: 'Джейсон Стетхем' },
+            { text: 'Одна голова — хорошо, а две — хорошо-хорошо.', author: 'Джейсон Стетхем' },
+            { text: 'Три слова — это два слова.', author: 'Джейсон Стетхем' },
+            { text: 'Я не бегаю по утрам. Утро само прибегает ко мне, чтобы не нарываться.', author: 'Джейсон Стетхем' },
+            { text: 'Запомни: всего одна ошибка — и ты ошибся.', author: 'Джейсон Стетхем' },
+            { text: 'Шли мы как-то всемером — я и мой друг-шестерка.', author: 'Джейсон Стетхем' },
+            { text: 'Делай, как надо. Как не надо — не делай.', author: 'Джейсон Стетхем' },
+            { text: 'Мне палец в рот не клади — подавишься.', author: 'Джейсон Стетхем' },
+            { text: 'В штанах две пушки. Один — огнестрел. Другой — для подружки.', author: 'Джейсон Стетхем' }
+        ];
+        let quoteIndex = 0;
+        const quoteOverlay = document.getElementById('quoteOverlay');
+        const quoteText = document.getElementById('quoteText');
+        const quoteAuthor = document.getElementById('quoteAuthor');
+        const quoteCloseBtn = document.getElementById('quoteCloseBtn');
+
+        function showQuote() {
+            const q = quotes[quoteIndex % quotes.length];
+            quoteText.textContent = q.text;
+            quoteAuthor.textContent = '— ' + q.author;
+            quoteOverlay.classList.add('show');
+            quoteIndex++;
+        }
+
+        function hideQuote() {
+            quoteOverlay.classList.remove('show');
+        }
+
+        quoteCloseBtn.addEventListener('click', hideQuote);
+        quoteOverlay.addEventListener('click', function(e) {
+            if (e.target === this) hideQuote();
+        });
+
+        // Показываем первую цитату через 30 секунд, затем каждые 2 минуты
+        setTimeout(() => {
+            showQuote();
+            setInterval(showQuote, 120000);
+        }, 30000);
+
+        // --- РАНДОМНАЯ СЕТКА ---
+        function applyRandomGrid() {
+            const cards = document.querySelectorAll('.product-card');
+            const variants = ['wide', 'tall', 'small', 'small', 'small'];
+            cards.forEach((card, i) => {
+                card.classList.remove('wide', 'tall', 'small');
+                const variant = variants[Math.floor(Math.random() * variants.length)];
+                card.classList.add(variant);
+                const delay = (Math.random() * 0.4).toFixed(2);
+                card.style.animationDelay = delay + 's';
+            });
+        }
+
+        // --- РАНДОМНЫЕ СКРУГЛЕНИЯ ---
         function applyRandomStyles() {
             document.querySelectorAll('.product-card').forEach(card => {
-                const variants = ['12px', '18px', '24px', '30px', '8px 24px', '24px 8px', '16px 28px', '28px 16px'];
+                const variants = ['12px', '18px', '24px', '30px', '8px 24px', '24px 8px', '16px 28px', '28px 16px', '0px',
+                    '0px 30px', '30px 0px'
+                ];
                 const r = variants[Math.floor(Math.random() * variants.length)];
                 card.style.borderRadius = r;
-                const shadow = ['0 4px 20px rgba(0,0,0,0.3)', '0 8px 30px rgba(0,180,255,0.05)', '0 12px 40px rgba(0,0,0,0.4)'];
+                const shadow = ['0 4px 20px rgba(0,0,0,0.3)', '0 8px 30px rgba(0,180,255,0.05)',
+                    '0 12px 40px rgba(0,0,0,0.4)'
+                ];
                 card.style.boxShadow = shadow[Math.floor(Math.random() * shadow.length)];
             });
         }
 
-        // --- РАНДОМНЫЕ ИКОНКИ ДЛЯ КНОПОК "В КОРЗИНУ" ---
+        // --- РАНДОМНЫЕ ИКОНКИ ---
         const cartIcons = ['fa-cart-plus', 'fa-bag-shopping', 'fa-basket-shopping', 'fa-hand-holding-heart', 'fa-circle-plus',
             'fa-crown', 'fa-star', 'fa-heart', 'fa-fire', 'fa-rocket'
         ];
@@ -1368,9 +1527,9 @@
             return cartIcons[iconIndex];
         }
 
-        // --- СЕКРЕТНАЯ ПАСХАЛКА ПО ЛОГОТИПУ ---
+        // --- СЕКРЕТНАЯ ПАСХАЛКА ---
         let logoClickCount = 0;
-        document.getElementById('logo')?.addEventListener('click', function() {
+        document.getElementById('logo').addEventListener('click', function() {
             logoClickCount++;
             if (logoClickCount === 5) {
                 alert('🔥 Ты нашёл пасхалку! FAKESHOP — стиль, который не купишь за деньги.');
@@ -1384,7 +1543,9 @@
             }
         });
 
-        // --- CONSTANTS ---
+        // ============================================================
+        // ОСНОВНАЯ ЛОГИКА (корзина, товары, админка)
+        // ============================================================
         const API_URL = window.location.origin;
         let currentCategory = 'Все';
         let currentPage = 0;
@@ -1623,6 +1784,7 @@
                 data.products.forEach(p => {
                     if (productsGrid) productsGrid.appendChild(createProductCard(p));
                 });
+                applyRandomGrid();
                 applyRandomStyles();
                 currentPage++;
                 hasMore = data.products.length === LIMIT;
@@ -1640,9 +1802,12 @@
                 random(jokes.productInStock).replace('{qty}', product.quantity) :
                 random(jokes.productOutOfStock);
             const icon = getRandomCartIcon();
+            // Собираем фото: если есть несколько, показываем первое
+            const photos = product.photo ? product.photo.split(',').map(s => s.trim()).filter(s => s) : [];
+            const firstPhoto = photos.length ? photos[0] : '';
             card.innerHTML = `
                 <div class="product-image" onclick="openProduct(${product.id})">
-                    ${product.photo ? `<img src="${product.photo}" loading="lazy">` : '<span class="placeholder-icon"><i class="fas fa-tshirt"></i></span>'}
+                    ${firstPhoto ? `<img src="${firstPhoto}" loading="lazy">` : '<span class="placeholder-icon"><i class="fas fa-tshirt"></i></span>'}
                     <span class="product-id-badge">#${product.id}</span>
                     <button class="product-share-btn" onclick="event.stopPropagation(); shareProduct(${product.id})"><i class="fas fa-share-alt"></i></button>
                 </div>
@@ -1667,9 +1832,29 @@
                 const statusText = inStock ?
                     random(jokes.productInStock).replace('{qty}', p.quantity) :
                     random(jokes.productOutOfStock);
+                const photos = p.photo ? p.photo.split(',').map(s => s.trim()).filter(s => s) : [];
+                const firstPhoto = photos.length ? photos[0] : '';
+                // Галерея: показываем все фото, если их несколько
+                let galleryHtml = '';
+                if (photos.length > 0) {
+                    galleryHtml = photos.map((ph, idx) =>
+                        `<img src="${ph}" style="width:100%;border-radius:12px;margin-bottom:8px;${idx > 0 ? 'display:none;' : ''}" class="gallery-img" data-index="${idx}">`
+                    ).join('');
+                    if (photos.length > 1) {
+                        galleryHtml +=
+                            `<div style="display:flex;gap:6px;justify-content:center;margin-top:4px;flex-wrap:wrap;">`;
+                        photos.forEach((_, idx) => {
+                            galleryHtml +=
+                                `<button onclick="switchGallery(${idx})" style="width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:${idx===0?'#00d4ff':'transparent'};cursor:pointer;padding:0;"></button>`;
+                        });
+                        galleryHtml += `</div>`;
+                    }
+                }
                 modalContent.innerHTML = `
                     <div class="modal-product-id">#${p.id}</div>
-                    <div class="modal-product-image">${p.photo ? `<img src="${p.photo}">` : '<i class="fas fa-tshirt" style="font-size:60px;opacity:0.3;"></i>'}</div>
+                    <div class="modal-product-image" id="modalGallery">
+                        ${galleryHtml || `<i class="fas fa-tshirt" style="font-size:60px;opacity:0.3;display:flex;align-items:center;justify-content:center;height:100%;"></i>`}
+                    </div>
                     <div class="modal-product-name">${escapeHtml(p.name)}</div>
                     <div class="modal-product-price">${p.price} BYN</div>
                     <div class="${inStock ? 'modal-product-status' : 'modal-product-status out-of-stock'}">${statusText}</div>
@@ -1681,8 +1866,25 @@
                     </div>
                 `;
                 modalOverlay.classList.add('open');
+                // Сохраняем список фото для галереи
+                window._galleryPhotos = photos;
+                window._currentGalleryIndex = 0;
             } catch (e) {}
         }
+
+        // Переключение галереи
+        window.switchGallery = function(index) {
+            const imgs = document.querySelectorAll('#modalGallery .gallery-img');
+            if (!imgs.length) return;
+            imgs.forEach((img, i) => {
+                img.style.display = i === index ? 'block' : 'none';
+            });
+            const dots = document.querySelectorAll('#modalGallery .gallery-dot');
+            dots.forEach((dot, i) => {
+                dot.style.background = i === index ? '#00d4ff' : 'transparent';
+            });
+            window._currentGalleryIndex = index;
+        };
 
         function closeModal() { if (modalOverlay) modalOverlay.classList.remove('open'); }
 
@@ -1853,6 +2055,7 @@
         function loadMore() { loadProducts(); }
 
         // --- АДМИНКА ---
+
         function switchAdminTab(tab) {
             adminTab = tab;
             document.querySelectorAll('.admin-tab').forEach(el => el.classList.remove('active'));
@@ -1905,6 +2108,7 @@
                         <div class="admin-list-item-info">
                             <div class="admin-list-item-title">#${p.id} ${escapeHtml(p.name)}</div>
                             <div class="admin-list-item-sub">${p.price} BYN · ${p.quantity} шт · ${p.category || 'Все'} ${p.quantity > 0 ? '✅' : '❌'} ${p.from_china ? '🌏 Из Китая' : ''}</div>
+                            <div class="admin-list-item-sub" style="font-size:10px;color:#444;">Фото: ${p.photo ? p.photo.split(',').filter(s=>s.trim()).length : 0}</div>
                         </div>
                         <div class="admin-list-actions">
                             <button class="view-btn" onclick="openProduct(${p.id})"><i class="fas fa-eye"></i></button>
@@ -1921,7 +2125,9 @@
             if (!c) return;
             c.style.display = c.style.display === 'none' ? 'block' : 'none';
             if (c.style.display === 'block') {
-                ['productName', 'productPrice', 'productQuantity', 'productPhoto', 'productNote'].forEach(id => {
+                ['productName', 'productPrice', 'productQuantity', 'productPhoto1', 'productPhoto2', 'productPhoto3',
+                    'productNote'
+                ].forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.value = '';
                 });
@@ -1939,7 +2145,9 @@
             const price = parseFloat(document.getElementById('productPrice')?.value);
             const quantity = parseInt(document.getElementById('productQuantity')?.value);
             const category = document.getElementById('productCategory')?.value || 'Все';
-            const photo = document.getElementById('productPhoto')?.value.trim();
+            const photo1 = document.getElementById('productPhoto1')?.value.trim();
+            const photo2 = document.getElementById('productPhoto2')?.value.trim();
+            const photo3 = document.getElementById('productPhoto3')?.value.trim();
             const note = document.getElementById('productNote')?.value.trim();
             const fromChina = document.getElementById('productFromChina')?.checked ? 1 : 0;
             const editId = document.getElementById('productFormSubmit')?.dataset.productId;
@@ -1947,6 +2155,9 @@
                 showToast('Заполните все поля', 'error');
                 return;
             }
+            // Собираем фото в строку через запятую
+            const photos = [photo1, photo2, photo3].filter(s => s && s.length > 0);
+            const photo = photos.join(',');
             const data = { name, price, quantity, category, photo, note, from_china: fromChina };
             try {
                 if (editId) {
@@ -1968,10 +2179,25 @@
                 toggleProductForm();
                 const title = document.getElementById('productFormTitle');
                 if (title) title.textContent = 'Редактировать товар';
-                ['productName', 'productPrice', 'productQuantity', 'productPhoto', 'productNote'].forEach(f => {
+                const fields = ['productName', 'productPrice', 'productQuantity', 'productNote'];
+                const map = {
+                    productName: 'name',
+                    productPrice: 'price',
+                    productQuantity: 'quantity',
+                    productNote: 'note'
+                };
+                fields.forEach(f => {
                     const el = document.getElementById(f);
-                    if (el) el.value = p[f.replace('product', '').toLowerCase()] || '';
+                    if (el) el.value = p[map[f]] || '';
                 });
+                // Фото
+                const photos = p.photo ? p.photo.split(',').map(s => s.trim()).filter(s => s) : [];
+                const p1 = document.getElementById('productPhoto1');
+                if (p1) p1.value = photos[0] || '';
+                const p2 = document.getElementById('productPhoto2');
+                if (p2) p2.value = photos[1] || '';
+                const p3 = document.getElementById('productPhoto3');
+                if (p3) p3.value = photos[2] || '';
                 const cat = document.getElementById('productCategory');
                 if (cat) cat.value = p.category || 'Все';
                 const ch = document.getElementById('productFromChina');
